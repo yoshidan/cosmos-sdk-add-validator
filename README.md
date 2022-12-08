@@ -8,7 +8,7 @@ cd cosmos-sdk-add-validator
 docker build -t hellod .
 ```
 
-### 2. Initialize the blockchain and run peer0.
+### 2. Initialize the blockchain.
 
 ```sh
 docker-compose run peer0-init 
