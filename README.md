@@ -123,9 +123,9 @@ validators:
   voting_power: "10"
 ```
 
-The total voting_power is `34`.
-* When only the peer0 is down, the `voting_power` is 24( > 2/3), so this chain can mine the blocks.
-* When only the peer1 is down, the `voting_power` is 22( < 2/3 ), so this chain can't mine the block.
+The total voting_power is `34`( 2/3 is 22.6666666667).
+* When only the peer0 is down, the `voting_power` is 24( > 22.6666666667), so this chain can mine the blocks.
+* When only the peer1 is down, the `voting_power` is 22( < 22.6666666667), so this chain can't mine the block.
 
 ### Restart peer1 and peer2
 ```
