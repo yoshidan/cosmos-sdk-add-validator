@@ -43,8 +43,9 @@ It is the only way to recover your account if you ever forget your password.
 develop hedgehog side sort beauty kick animal undo double shallow frown betray axis leave empty suspect profit loud poverty dutch person fork regular alter
 ```
 
+The result of peer1 and peer2 initialization is
 * All the peers use same `genesis.json`.
-* Each node-id is added into the `persistent_peers` in config.toml.
+* Each node-id is added into the `persistent_peers` in `config.toml`.
 
 ### 4. Run all the peers
 ```sh
@@ -52,43 +53,43 @@ docker-compose up peer1
 docker-compose up peer2
 ```
 
-Now only peer0 is the validator because peer1 and peer2 doesn't have account'. 
+Now only peer0 is the validator'. 
 The pee1 and the peer2 only can receive the blocks.
 
 ### 5. Send staking amount to pee1
 
 ```sh
-# get the self-delegator address
+# get the delegator address for peer1-validator  
 PEER1_DELEGATOR_ADDRESS=$(docker-compose exec peer1 hellod keys show peer1-validator -a --keyring-backend test)
 
 # remove line separator
 PEER1_DELEGATOR_ADDRESS=${PEER1_DELEGATOR_ADDRESS/%?/}
 
-# send the token to self-delegator-address
+# send the token to delegator address
 docker-compose exec peer0 hellod tx bank send peer0-validator $PEER1_DELEGATOR_ADDRESS 15000000stake --keyring-backend test
 
 # set the validator pubkey
 PEER1_VALIDATOR_PUBKEY=$(docker-compose exec peer1 hellod tendermint show-validator)
 
-# create the peer1 validator 
+# enable the peer1-validator 
 docker-compose exec peer1 hellod tx staking create-validator --amount=12000000stake --pubkey=$PEER1_VALIDATOR_PUBKEY --moniker="peer1" --commission-rate="0.10" --commission-max-rate="0.20" --commission-max-change-rate="0.01" --min-self-delegation="1000"  --gas-prices="0.0025stake" --from=peer1-validator --keyring-backend=test
 ```
 
 ### 6. Send staking amount to pee2
 ```sh
-# get the self-delegator address
+# get the delegator address for peer2-validator  
 PEER2_DELEGATOR_ADDRESS=$(docker-compose exec peer2 hellod keys show peer2-validator -a --keyring-backend test)
 
 # remove line separator
 PEER2_DELEGATOR_ADDRESS=${PEER2_DELEGATOR_ADDRESS/%?/}
 
-# send the token to self-delegator-address
+# send the token to delegator address
 docker-compose exec peer0 hellod tx bank send peer0-validator $PEER2_DELEGATOR_ADDRESS 15000000stake --keyring-backend test
 
 # set the validator pubkey
 PEER2_VALIDATOR_PUBKEY=$(docker-compose exec peer2 hellod tendermint show-validator)
 
-# create the peer2 validator 
+# enable the peer2-validator 
 docker-compose exec peer2 hellod tx staking create-validator --amount=12000000stake --pubkey=$PEER2_VALIDATOR_PUBKEY --moniker="peer1" --commission-rate="0.10" --commission-max-rate="0.20" --commission-max-change-rate="0.01" --min-self-delegation="1000"  --gas-prices="0.0025stake" --from=peer2-validator --keyring-backend=test
 ```
 
