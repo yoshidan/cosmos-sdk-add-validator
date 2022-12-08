@@ -1,16 +1,16 @@
 ## How to add the validator to the cosmos-sdk based blockchain.
 
-### Build the blockchain application.
+### 1. Build the blockchain application.
 
-```
+```sh
 git clone https://github.com/yoshidan/cosmos-sdk-add-validator
 cd cosmos-sdk-add-validator
 docker build -t hellod .
 ```
 
-### Initialize the blockchain and run peer0.
+### 2. Initialize the blockchain and run peer0.
 
-```
+```sh
 docker-compose run peer0-init 
 docker-compose up peer0
 ```
@@ -23,8 +23,8 @@ peer0_1       | 7:59AM INF committed state app_hash=B100992977B067B0BBD8D23307E7
 peer0_1       | 7:59AM INF indexed block exents height=1 module=txindex
 ```
 
-### Add the peer1 and peer2
-```
+### 3. Add the peer1 and peer2
+```sh
 docker-compose run peer1-init
 docker-compose run peer2-init
 ```
@@ -46,8 +46,8 @@ develop hedgehog side sort beauty kick animal undo double shallow frown betray a
 * All the peers use same `genesis.json`.
 * Each node-id is added into the `persistent_peers` in config.toml.
 
-### Run all the peers
-```
+### 4. Run all the peers
+```sh
 docker-compose up peer1
 docker-compose up peer2
 ```
@@ -55,9 +55,9 @@ docker-compose up peer2
 Now only peer0 is the validator because peer1 and peer2 doesn't have account'. 
 The pee1 and the peer2 only can receive the blocks.
 
-### Send staking amount to pee1
+### 5. Send staking amount to pee1
 
-```
+```sh
 # get the self-delegator address
 PEER1_DELEGATOR_ADDRESS=$(docker-compose exec peer1 hellod keys show peer1-validator -a --keyring-backend test)
 
@@ -74,8 +74,8 @@ PEER1_VALIDATOR_PUBKEY=$(docker-compose exec peer1 hellod tendermint show-valida
 docker-compose exec peer1 hellod tx staking create-validator --amount=12000000stake --pubkey=$PEER1_VALIDATOR_PUBKEY --moniker="peer1" --commission-rate="0.10" --commission-max-rate="0.20" --commission-max-change-rate="0.01" --min-self-delegation="1000"  --gas-prices="0.0025stake" --from=peer1-validator --keyring-backend=test
 ```
 
-### Send staking amount to pee2
-```
+### 6. Send staking amount to pee2
+```sh
 # get the self-delegator address
 PEER2_DELEGATOR_ADDRESS=$(docker-compose exec peer2 hellod keys show peer2-validator -a --keyring-backend test)
 
@@ -92,10 +92,10 @@ PEER2_VALIDATOR_PUBKEY=$(docker-compose exec peer2 hellod tendermint show-valida
 docker-compose exec peer2 hellod tx staking create-validator --amount=12000000stake --pubkey=$PEER2_VALIDATOR_PUBKEY --moniker="peer1" --commission-rate="0.10" --commission-max-rate="0.20" --commission-max-change-rate="0.01" --min-self-delegation="1000"  --gas-prices="0.0025stake" --from=peer2-validator --keyring-backend=test
 ```
 
-### Check the validator set
+### 7. Check the validator set
 You can see 3 validators by following command if the transaction of `create-validator` is success .
 
-```
+```sh
 docker-compose exec peer0 hellod query tendermint-validator-set
 ```
 
@@ -127,8 +127,8 @@ The total voting_power is `34`( 2/3 is 22.6666666667).
 * When only the peer0 is down, the `voting_power` is 24( > 22.6666666667), so this chain can mine the blocks.
 * When only the peer1 is down, the `voting_power` is 22( < 22.6666666667), so this chain can't mine the block.
 
-### Restart peer1 and peer2
-```
+### 8. Restart peer1 and peer2
+```sh
 docker-compose stop peer1
 docker-compose stop peer2
 docker-compose up peer1
