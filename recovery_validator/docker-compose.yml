@@ -1,0 +1,88 @@
+version: "3.8"
+
+services:
+  peer0-init:
+    image: hellod
+    command: > 
+     sh -c '
+       # create peer0 validator
+       hellod keys add peer0-validator --keyring-backend test
+       hellod init peer0
+       hellod add-genesis-account $$(hellod keys show peer0-validator -a --keyring-backend test) 10000000000stake,1000coin
+       # create genesis.json with genesis acount and validator
+       hellod gentx peer0-validator 10000000stake --keyring-backend test
+       hellod collect-gentxs
+       hellod validate-genesis
+
+       # backup
+       cp -R /root/.hello/config /root/backup/
+       cp -R /root/.hello/keyring-test /root/backup/
+     '
+    volumes:
+      - ./localnet/peer0:/root/.hello
+      - ./localnet/backup:/root/backup
+  peer1-init:
+    image: hellod
+    command: >
+      sh -c '
+        # generate config and data directory
+        hellod init peer1
+
+        # set peer0 node into persistent_peer 
+        export GENESIS_NODE_ID=$$(hellod tendermint show-node-id --home /peer0/.hello)
+        sed -i -e s/"persistent_peers = \"\""/"persistent_peers = \"$${GENESIS_NODE_ID}@172.27.12.12:26656\""/g /root/.hello/config/config.toml
+
+        # genesis.json must be same as peer0
+        cp /peer0/.hello/config/genesis.json /root/.hello/config/genesis.json
+      '
+    volumes:
+      - ./localnet/peer0:/peer0/.hello
+      - ./localnet/peer1:/root/.hello
+  peer2-init:
+    image: hellod
+    command: > 
+      sh -c '
+        hellod init peer2
+      
+        # use same validator and config as peer0
+        cp -R /backup/config /root/.hello/
+        cp -R /backup/keyring-test /root/.hello/
+
+        # set peer1 node into persistent_peer 
+        export PEER1_NODE_ID=$$(hellod tendermint show-node-id --home /peer1/.hello)
+        sed -i -e s/"persistent_peers = \"\""/"persistent_peers = \"$${PEER1_NODE_ID}@172.27.12.13:26656\""/g /root/.hello/config/config.toml
+      '
+    volumes:
+      - ./localnet/backup:/backup/
+      - ./localnet/peer1:/peer1/.hello
+      - ./localnet/peer2:/root/.hello
+  peer0:
+    image: hellod
+    command: hellod start
+    volumes:
+      - ./localnet/peer0:/root/.hello
+    networks:
+      private_chain:
+        ipv4_address: 172.27.12.12
+  peer1:
+    image: hellod
+    command: hellod start
+    volumes:
+      - ./localnet/peer1:/root/.hello
+    networks:
+      private_chain:
+        ipv4_address: 172.27.12.13
+  peer2:
+    image: hellod
+    command: hellod start
+    volumes:
+      - ./localnet/peer2:/root/.hello
+    networks:
+      private_chain:
+        ipv4_address: 172.27.12.14
+networks:
+  private_chain:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.27.12.0/24
