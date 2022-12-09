@@ -2,13 +2,13 @@
 
 ### 1. Initialize the blockchain and run the validator node.
 
-```
+```sh
 docker-compose run peer0-init 
 docker-compose up peer0
 ```
 
 ### 2. Add the not validator node
-```
+```sh
 docker-compose run peer1-init
 docker-compose up peer1
 ```
