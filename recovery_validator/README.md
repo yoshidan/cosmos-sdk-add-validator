@@ -55,7 +55,7 @@ pagination:
 docker-compose stop peer0
 ```
 
-### 5. Create other node which use same config and key as peer0
+### 5. Create new node which use same config and validator as peer0
 
 ```sh
 docker-compose run peer2-init
