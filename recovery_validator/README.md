@@ -7,6 +7,8 @@ docker-compose run peer0-init
 docker-compose up peer0
 ```
 
+* The peer0's `config` and `keyring-test` is copied to other directory as backup.
+
 ### 2. Add the not validator node
 ```sh
 docker-compose run peer1-init
