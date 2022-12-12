@@ -1,0 +1,10 @@
+FROM ignitehq/cli AS builder
+ENTRYPOINT []
+
+RUN /usr/bin/ignite scaffold chain chainb
+RUN cd chainb && /usr/bin/ignite chain build
+
+FROM busybox
+WORKDIR /
+COPY --from=builder /go/bin/chainbd /usr/bin/chainbd
+CMD ["chainbd"]

@@ -1,0 +1,83 @@
+version: "3.8"
+
+services:
+  chainA-init:
+    image: chaina
+    command: > 
+     sh -c '
+       # create peer validator
+       chainad keys add chaina-validator --keyring-backend test
+       chainad init chaina --staking-bond-denom basea
+       chainad add-genesis-account $$(chainad keys show chaina-validator -a --keyring-backend test) 10000000000basea,10000coin
+       # create genesis.json with genesis acount and validator
+       chainad gentx chaina-validator 10000000basea --keyring-backend test
+       chainad collect-gentxs
+       chainad validate-genesis
+       sed -i -e s/127.0.0.1:26657/0.0.0.0:26657/g /root/.chaina/config/config.toml
+     '
+    volumes:
+      - ./localnet/chaina:/root/.chaina
+  chainA:
+    image: chaina
+    command: chainad start
+    volumes:
+      - ./localnet/chaina:/root/.chaina
+    networks:
+      private_chain:
+        ipv4_address: 172.27.13.11
+  chainB-init:
+    image: chainb
+    command: > 
+     sh -c '
+       # create peer validator
+       chainbd keys add chainb-validator --keyring-backend test
+       chainbd init chainb --staking-bond-denom baseb
+       chainbd add-genesis-account $$(chainbd keys show chainb-validator -a --keyring-backend test) 10000000000baseb,10000coin
+       # create genesis.json with genesis acount and validator
+       chainbd gentx chainb-validator 10000000baseb --keyring-backend test
+       chainbd collect-gentxs
+       chainbd validate-genesis
+       sed -i -e s/127.0.0.1:26657/0.0.0.0:26657/g /root/.chainb/config/config.toml
+     '
+    volumes:
+      - ./localnet/chainb:/root/.chainb
+  chainB:
+    image: chainb
+    command: chainbd start
+    volumes:
+      - ./localnet/chainb:/root/.chainb
+    networks:
+      private_chain:
+        ipv4_address: 172.27.13.12
+  relayer-account-ab:
+    image: ignitehq/cli
+    command: account create relayer-a-b
+    volumes:
+      - ./localnet/ignite:/home/tendermint/.ignite
+  relayer-account-ba:
+    image: ignitehq/cli
+    command: account create relayer-b-a
+    volumes:
+      - ./localnet/ignite:/home/tendermint/.ignite
+  relayer-init:
+    image: ignitehq/cli
+    command: relayer configure --source-account relayer-a-b --source-rpc "http://chainA:26657" --source-gasprice "0.025basea" --target-account relayer-b-a --target-rpc "http://chainB:26657" --target-gasprice "0.025baseb"
+    volumes:
+      - ./localnet/ignite:/home/tendermint/.ignite
+    networks: 
+      private_chain:
+        ipv4_address: 172.27.13.50
+  relayer:
+    image: ignitehq/cli
+    command: relayer connect
+    volumes:
+      - ./localnet/ignite:/home/tendermint/.ignite
+    networks: 
+      private_chain:
+        ipv4_address: 172.27.13.50
+networks:
+  private_chain:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.27.13.0/24
