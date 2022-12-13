@@ -129,7 +129,7 @@ peer1_1       | 7:41AM INF This node is a validator addr=DCCDAA29C263580A16A0CA1
 ### 8. Receive validator rewards
 
 Check the rewards.
-```
+```sh
 $ docker-compose exec peer1 hellod query distribution rewards $PEER1_DELEGATOR_ADDRESS
 
 rewards:
