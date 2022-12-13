@@ -126,7 +126,7 @@ You can see `This node is a validator` in peer1's log and peer2's log
 peer1_1       | 7:41AM INF This node is a validator addr=DCCDAA29C263580A16A0CA18342F666078E2B368 module=consensus pubKey=j60ySvfDuNCOBuN6br/Dzy8Y20skFaslYCKQJdLtGmI=
 ```
 
-### 8. Receive validator rewards
+### 8. Receive the rewards
 
 Check the rewards.
 ```sh
