@@ -144,7 +144,7 @@ total:
 
 Get the rewards.
 
-```
+```sh
 $  docker-compose exec peer1 hellod tx distribution withdraw-all-rewards --from peer1-validator --keyring-backend test -y
 
 # check result
@@ -158,5 +158,17 @@ rewards:
   validator_address: cosmosvaloper15mketdru3gdpch70p0vgudmj9dr2cu229j6ytc
 total:
 - amount: "121.118823529404000000"
+  denom: stake
+```
+
+Get the rewards with commission.
+```sh
+$ docker-compose exec peer1 hellod tx distribution withdraw-rewards cosmosvaloper15mketdru3gdpch70p0vgudmj9dr2cu229j6ytc --commission --from peer1-validator --keyring-backend test -y
+
+# check result
+$ docker-compose exec peer1 hellod query distribution commission cosmosvaloper15mketdru3gdpch70p0vgudmj9dr2cu229j6ytc
+
+commission:
+- amount: "7.879973262032083892"
   denom: stake
 ```
