@@ -14,6 +14,8 @@ services:
        chainad collect-gentxs
        chainad validate-genesis
        sed -i -e s/127.0.0.1:26657/0.0.0.0:26657/g /root/.chaina/config/config.toml
+       sed -i -e s/0stake/0basea/g /root/.chaina/config/app.toml
+       sed -i -e s/\"stake\"/\"basea\"/g /root/.chaina/config/genesis.json
      '
     volumes:
       - ./localnet/chaina:/root/.chaina
@@ -38,6 +40,8 @@ services:
        chainbd collect-gentxs
        chainbd validate-genesis
        sed -i -e s/127.0.0.1:26657/0.0.0.0:26657/g /root/.chainb/config/config.toml
+       sed -i -e s/0stake/0baseb/g /root/.chainb/config/app.toml
+       sed -i -e s/\"stake\"/\"baseb\"/g /root/.chainb/config/genesis.json
      '
     volumes:
       - ./localnet/chainb:/root/.chainb
